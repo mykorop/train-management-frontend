@@ -58,6 +58,10 @@
                     pTooltip="Update Quantity"/>
                 }
               </div>
+            } @else if (col.field === 'canAssignQuantity') {
+              <i 
+                [class]="component.canAssignQuantity ? 'pi pi-check text-green-600' : 'pi pi-times text-gray-400'"
+                [style.fontSize]="'1.25rem'"></i>
             } @else {
               {{ component[col.field] || '-' }}
             }
