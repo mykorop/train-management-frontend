@@ -1,0 +1,20 @@
+<p-dialog header="Train Component Creation Dialog" [closable]="false" [modal]="true" [visible]="visibility()" [style]="{ width: '40rem' }">
+  <div [formGroup]="form">
+    <div class="flex items-center gap-4 mb-4">
+      <label for="name" class="font-semibold w-50">Component Name</label>
+      <input pInputText id="name" class="flex-auto" formControlName="name" placeholder="For ex. Engine" autocomplete="off"/>
+    </div>
+    <div class="flex items-center gap-4 mb-8">
+      <label for="uniqueNumber" class="font-semibold w-50">Unique Number</label>
+      <input pInputText id="uniqueNumber" class="flex-auto" formControlName="uniqueNumber" placeholder="For ex. ENG123" autocomplete="off"/>
+    </div>
+    <div class="flex items-center gap-4 mb-8">
+      <label for="canAssignQuantity" class="font-semibold w-50">Can Assign Quantity?</label>
+      <p-checkbox [binary]="true" formControlName="canAssignQuantity"/>
+    </div>
+  </div>
+  <div class="flex justify-end gap-2">
+    <p-button label="Cancel" severity="secondary" (click)="closeModal()"/>
+    <p-button label="Save" (click)="saveForm()"/>
+  </div>
+</p-dialog>

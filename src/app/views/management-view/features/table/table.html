@@ -1,0 +1,37 @@
+<div class="card">
+  <p-table
+    [value]="computedItems()"
+    [paginator]="true"
+    [rows]="10"
+    [first]="first"
+    [showCurrentPageReport]="true"
+    [tableStyle]="{ 'min-width': '50rem' }"
+    [totalRecords]="data()?.totalCount || 0"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    (onPage)="pageChange($event)"
+    [rowsPerPageOptions]="[10, 25, 50]">
+
+    <ng-template #header>
+      <tr>
+        @for (col of tableColumnsConfig; track col) {
+          <th style="width:25%">{{col.header}}</th>
+        }
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-component>
+      <tr>
+        @for (col of tableColumnsConfig; track col) {
+          <td>{{ component[col.field] || '-' }}</td>
+        }
+      </tr>
+    </ng-template>
+
+    <ng-template #paginatorleft>
+      <p-button type="button" icon="pi pi-plus" text />
+    </ng-template>
+    <ng-template #paginatorright>
+      <p-button type="button" icon="pi pi-cloud" text />
+    </ng-template>
+  </p-table>
+</div>
