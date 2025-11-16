@@ -16,13 +16,18 @@ export class TrainComponentsService {
   constructor(private http: HttpClient) {
   }
 
-  getComponents(pageNumber: number, pageSize: number): Observable<TrainDataPaginationModel> {
-    return this.http.get<TrainDataPaginationModel>(`${this.apiUrl}/components`, {
-      params: {
-        pageNumber: pageNumber,
-        pageSize: pageSize
-      }
-    });
+  getComponents(pageNumber: number, pageSize: number, searchTerm: string = ''): Observable<TrainDataPaginationModel> {
+    // todo
+    const params: any = {
+      pageNumber: pageNumber,
+      pageSize: pageSize
+    };
+
+    if (searchTerm) {
+      params.searchTerm = searchTerm;
+    }
+
+    return this.http.get<TrainDataPaginationModel>(`${this.apiUrl}/components`, { params });
   }
 
   createComponent(component: TrainComponentCreateModel): Observable<TrainComponentModel> {

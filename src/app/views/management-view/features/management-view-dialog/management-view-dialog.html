@@ -3,23 +3,23 @@
   [closable]="false" 
   [modal]="true" 
   [visible]="visibility()" 
-  [style]="{ width: '40rem' }">
+  [style]="{ width: '32rem' }">
   <div [formGroup]="form">
-    <div class="flex items-center gap-4 mb-4">
-      <label for="name" class="font-semibold w-50">Component Name</label>
-      <input pInputText id="name" class="flex-auto" formControlName="name" placeholder="For ex. Engine" autocomplete="off"/>
+    <div class="flex flex-col gap-2 mb-4">
+      <label for="name" class="font-semibold">Component Name</label>
+      <input pInputText id="name" class="w-full" formControlName="name" placeholder="e.g., Engine" autocomplete="off"/>
     </div>
-    <div class="flex items-center gap-4 mb-8">
-      <label for="uniqueNumber" class="font-semibold w-50">Unique Number</label>
-      <input pInputText id="uniqueNumber" class="flex-auto" formControlName="uniqueNumber" placeholder="For ex. ENG123" autocomplete="off"/>
+    <div class="flex flex-col gap-2 mb-4">
+      <label for="uniqueNumber" class="font-semibold">Unique Number</label>
+      <input pInputText id="uniqueNumber" class="w-full" formControlName="uniqueNumber" placeholder="e.g., ENG123" autocomplete="off"/>
     </div>
-    <div class="flex items-center gap-4 mb-8">
-      <label for="canAssignQuantity" class="font-semibold w-50">Can Assign Quantity?</label>
-      <p-checkbox [binary]="true" formControlName="canAssignQuantity"/>
+    <div class="flex items-center gap-3 mb-4">
+      <p-checkbox [binary]="true" formControlName="canAssignQuantity" inputId="canAssignQuantity"/>
+      <label for="canAssignQuantity" class="cursor-pointer">Can Assign Quantity</label>
     </div>
   </div>
   <div class="flex justify-end gap-2">
     <p-button label="Cancel" severity="secondary" (click)="closeModal()"/>
-    <p-button [label]="editMode() ? 'Update' : 'Save'" (click)="saveForm()"/>
+    <p-button [label]="editMode() ? 'Update' : 'Create'" (click)="saveForm()"/>
   </div>
 </p-dialog>

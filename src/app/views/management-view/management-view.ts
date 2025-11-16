@@ -11,6 +11,10 @@ import {TableComponent} from './features/table/table';
 import {ConfirmationService, MessageService} from 'primeng/api';
 import {ConfirmDialog} from 'primeng/confirmdialog';
 import {UpdateQuantityDialog} from './features/update-quantity-dialog/update-quantity-dialog';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {InputText} from 'primeng/inputtext';
+import {debounceTime, distinctUntilChanged, Subject} from 'rxjs';
 
 @Component({
   templateUrl: './management-view.html',
@@ -20,7 +24,10 @@ import {UpdateQuantityDialog} from './features/update-quantity-dialog/update-qua
     Button,
     ManagementViewDialog,
     ConfirmDialog,
-    UpdateQuantityDialog
+    UpdateQuantityDialog,
+    IconField,
+    InputIcon,
+    InputText
   ],
   providers: [
     TrainComponentsService,
@@ -31,6 +38,8 @@ export class ManagementViewComponent implements OnInit {
 
   // data
   trainComponents = signal<TrainDataPaginationModel | null>(null);
+  searchTerm = signal<string>('');
+  private searchSubject = new Subject<string>();
 
   // view children
   dialog = viewChild.required(ManagementViewDialog);
@@ -44,16 +53,34 @@ export class ManagementViewComponent implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService
   ) {
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(term => {
+      this.searchTerm.set(term);
+      this.getTrainComponents();
+    });
   }
 
   ngOnInit(): void {
     this.getTrainComponents();
   }
 
-  getTrainComponents(pageNumber: number = 1, pageSize: number = 10): void {
-    this.trainComponentsService.getComponents(pageNumber, pageSize).subscribe({
+  getTrainComponents(pageNumber: number = 0, pageSize: number = 10): void {
+    this.trainComponentsService.getComponents(pageNumber, pageSize, this.searchTerm()).subscribe({
       next: (data) => this.trainComponents.set(data)
     });
+  }
+
+  onSearchChange(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.searchSubject.next(value);
+  }
+
+  clearSearch(): void {
+    this.searchTerm.set('');
+    this.searchSubject.next('');
+    this.getTrainComponents();
   }
 
   openCreateDialog(): void {
@@ -64,7 +91,7 @@ export class ManagementViewComponent implements OnInit {
     if (!component) return;
 
     const editId = this.dialog().editId();
-    
+
     if (editId) {
       this.trainComponentsService.updateComponent(editId, component).subscribe({
         next: () => {

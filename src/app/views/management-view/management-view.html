@@ -1,11 +1,38 @@
-<p-button (click)="openCreateDialog()" label="Add Train Component" />
+<div class="container">
+  <div class="header-section">
+    <h1 class="page-title">Train Components</h1>
 
-<table-components
-  [data]="trainComponents()"
-  (onEdit)="handleEdit($event)"
-  (pageChanged)="getTrainComponents($event.first, $event.rows)"
-  (onUpdateQuantity)="handleUpdateQuantity($event)"
-  (onDelete)="handleDelete($event)" />
+    <div class="header-actions">
+      <p-iconfield iconPosition="left" class="search-field">
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          pInputText
+          type="text"
+          placeholder="Search components..."
+          [value]="searchTerm()"
+          (input)="onSearchChange($event)" />
+        @if (searchTerm()) {
+          <p-inputicon
+            styleClass="pi pi-times cursor-pointer"
+            (click)="clearSearch()" />
+        }
+      </p-iconfield>
+
+      <p-button
+        (click)="openCreateDialog()"
+        label="Add Component"
+        icon="pi pi-plus"
+        severity="success" />
+    </div>
+  </div>
+
+  <table-components
+    [data]="trainComponents()"
+    (onEdit)="handleEdit($event)"
+    (pageChanged)="getTrainComponents($event.pageNumber, $event.pageSize)"
+    (onUpdateQuantity)="handleUpdateQuantity($event)"
+    (onDelete)="handleDelete($event)" />
+</div>
 
 <management-view-dialog (compDataChange)="saveComponent($event)" />
 

@@ -6,7 +6,7 @@ import {Button} from 'primeng/button';
 import {TrainComponentModel, TrainDataPaginationModel} from '../management-view-dialog/models/train-component.model';
 import {tableColumnsConfig} from './config/table-columns.config';
 import {Tooltip} from 'primeng/tooltip';
-import {PageChangeModel} from './models/page-change.model';
+import {ParamsModel} from '../../services/models/params.model';
 
 @Component({
   selector: 'table-components',
@@ -27,7 +27,7 @@ export class TableComponent {
   onEdit = output<TrainComponentModel>();
   onUpdateQuantity = output<TrainComponentModel>();
   onDelete = output<TrainComponentModel>();
-  pageChanged = output<PageChangeModel>();
+  pageChanged = output<ParamsModel>();
 
   // data
   items: TrainComponentModel[] = [];
@@ -46,7 +46,7 @@ export class TableComponent {
     this.first = event.first;
     this.rows = event.rows;
 
-    this.pageChanged.emit({first: this.first, rows: this.rows});
+    this.pageChanged.emit({pageNumber: this.first / this.rows, pageSize: this.rows});
   }
 
   editComponent(component: TrainComponentModel) {
