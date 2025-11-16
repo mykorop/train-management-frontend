@@ -1,7 +1,16 @@
-<p-button (click)="showModal = true" label="Add Train Component" />
+<p-button (click)="openCreateDialog()" label="Add Train Component" />
 
-<shared-table [data]="trainComponents()" />
+<table-components
+  [data]="trainComponents()"
+  (onEdit)="handleEdit($event)"
+  (pageChanged)="getTrainComponents($event.first, $event.rows)"
+  (onUpdateQuantity)="handleUpdateQuantity($event)"
+  (onDelete)="handleDelete($event)" />
 
-<management-view-dialog [visibility]="showModal" (visibilityChange)="showModal = $event" (compDataChange)="saveComponent($event)" />
+<management-view-dialog (compDataChange)="saveComponent($event)" />
+
+<update-quantity-dialog (quantityChange)="updateQuantity($event)" />
+
+<p-confirmDialog />
 
 

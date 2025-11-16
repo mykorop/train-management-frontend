@@ -20,5 +20,9 @@ export const tableColumnsConfig: ColumnModel[] = [
   {
     field: 'quantity',
     header: 'Quantity'
+  },
+  {
+    field: 'actions',
+    header: 'Actions'
   }
 ]

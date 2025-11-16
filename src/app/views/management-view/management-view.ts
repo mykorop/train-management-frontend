@@ -1,13 +1,16 @@
-import {Component, OnInit, signal} from '@angular/core';
+import {Component, OnInit, signal, viewChild} from '@angular/core';
 import {TrainComponentsService} from './services/train-components.service';
 import {Button} from 'primeng/button';
 import {ManagementViewDialog} from './features/management-view-dialog/management-view-dialog';
 import {
   TrainComponentCreateModel,
+  TrainComponentModel,
   TrainDataPaginationModel
 } from './features/management-view-dialog/models/train-component.model';
 import {TableComponent} from './features/table/table';
-import {MessageService} from 'primeng/api';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {ConfirmDialog} from 'primeng/confirmdialog';
+import {UpdateQuantityDialog} from './features/update-quantity-dialog/update-quantity-dialog';
 
 @Component({
   templateUrl: './management-view.html',
@@ -15,10 +18,13 @@ import {MessageService} from 'primeng/api';
   imports: [
     TableComponent,
     Button,
-    ManagementViewDialog
+    ManagementViewDialog,
+    ConfirmDialog,
+    UpdateQuantityDialog
   ],
   providers: [
-    TrainComponentsService
+    TrainComponentsService,
+    ConfirmationService
   ]
 })
 export class ManagementViewComponent implements OnInit {
@@ -26,12 +32,17 @@ export class ManagementViewComponent implements OnInit {
   // data
   trainComponents = signal<TrainDataPaginationModel | null>(null);
 
+  // view children
+  dialog = viewChild.required(ManagementViewDialog);
+  quantityDialog = viewChild.required(UpdateQuantityDialog);
+
   // config
-  showModal = false;
+  selectedComponentId: number | null = null;
 
   constructor(
     private trainComponentsService: TrainComponentsService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
   ) {
   }
 
@@ -39,14 +50,34 @@ export class ManagementViewComponent implements OnInit {
     this.getTrainComponents();
   }
 
-  getTrainComponents(): void {
-    this.trainComponentsService.getComponents().subscribe({
+  getTrainComponents(pageNumber: number = 1, pageSize: number = 10): void {
+    this.trainComponentsService.getComponents(pageNumber, pageSize).subscribe({
       next: (data) => this.trainComponents.set(data)
     });
   }
 
+  openCreateDialog(): void {
+    this.dialog().openForCreate();
+  }
+
   saveComponent(component: TrainComponentCreateModel | null): void {
-    if (component) {
+    if (!component) return;
+
+    const editId = this.dialog().editId();
+    
+    if (editId) {
+      this.trainComponentsService.updateComponent(editId, component).subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Train component updated successfully',
+            life: 3000
+          });
+          this.getTrainComponents();
+        }
+      });
+    } else {
       this.trainComponentsService.createComponent(component).subscribe({
         next: () => {
           this.messageService.add({
@@ -57,7 +88,60 @@ export class ManagementViewComponent implements OnInit {
           });
           this.getTrainComponents();
         }
-      })
+      });
     }
+  }
+
+  handleEdit(component: TrainComponentModel): void {
+    this.dialog().openForEdit(component.id, {
+      name: component.name,
+      uniqueNumber: component.uniqueNumber,
+      canAssignQuantity: component.canAssignQuantity
+    });
+  }
+
+  handleUpdateQuantity(component: TrainComponentModel): void {
+    this.selectedComponentId = component.id;
+    this.quantityDialog().setQuantity(component.quantity);
+    this.quantityDialog().visibility.set(true);
+  }
+
+  updateQuantity(quantity: number | null): void {
+    if (this.selectedComponentId && quantity !== null) {
+      this.trainComponentsService.updateQuantity(this.selectedComponentId, quantity).subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Quantity updated successfully',
+            life: 3000
+          });
+          this.getTrainComponents();
+          this.selectedComponentId = null;
+        }
+      });
+    }
+  }
+
+  handleDelete(component: TrainComponentModel): void {
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete "${component.name}"?`,
+      header: 'Delete Confirmation',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.trainComponentsService.deleteComponent(component.id).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Train component deleted successfully',
+              life: 3000
+            });
+            this.getTrainComponents();
+          }
+        });
+      }
+    });
   }
 }

@@ -5,6 +5,7 @@
     [rows]="10"
     [first]="first"
     [showCurrentPageReport]="true"
+    [lazy]="true"
     [tableStyle]="{ 'min-width': '50rem' }"
     [totalRecords]="data()?.totalCount || 0"
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
@@ -14,7 +15,7 @@
     <ng-template #header>
       <tr>
         @for (col of tableColumnsConfig; track col) {
-          <th style="width:25%">{{col.header}}</th>
+          <th [style.width]="col.field === 'actions' ? '200px' : 'auto'">{{ col.header }}</th>
         }
       </tr>
     </ng-template>
@@ -22,16 +23,53 @@
     <ng-template #body let-component>
       <tr>
         @for (col of tableColumnsConfig; track col) {
-          <td>{{ component[col.field] || '-' }}</td>
+          <td>
+            @if (col.field === 'actions') {
+              <div class="flex gap-2">
+                <p-button
+                  icon="pi pi-pencil"
+                  severity="secondary"
+                  size="small"
+                  [rounded]="true"
+                  [outlined]="true"
+                  (onClick)="editComponent(component)"
+                  tooltipPosition="left"
+                  pTooltip="Edit"/>
+                <p-button
+                  icon="pi pi-trash"
+                  severity="danger"
+                  size="small"
+                  [rounded]="true"
+                  [outlined]="true"
+                  (onClick)="deleteComponent(component)"
+                  tooltipPosition="left"
+                  pTooltip="Delete"/>
+
+                @if (component.canAssignQuantity) {
+                  <p-button
+                    icon="pi pi-hashtag"
+                    severity="info"
+                    size="small"
+                    [rounded]="true"
+                    [outlined]="true"
+                    (onClick)="updateQuantity(component)"
+                    tooltipPosition="left"
+                    pTooltip="Update Quantity"/>
+                }
+              </div>
+            } @else {
+              {{ component[col.field] || '-' }}
+            }
+          </td>
         }
       </tr>
     </ng-template>
 
     <ng-template #paginatorleft>
-      <p-button type="button" icon="pi pi-plus" text />
+      <p-button type="button" icon="pi pi-plus" text/>
     </ng-template>
     <ng-template #paginatorright>
-      <p-button type="button" icon="pi pi-cloud" text />
+      <p-button type="button" icon="pi pi-cloud" text/>
     </ng-template>
   </p-table>
 </div>
