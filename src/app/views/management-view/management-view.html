@@ -1,6 +1,6 @@
 <p-button (click)="showModal = true" label="Add Train Component" />
 
-<shared-table [data]="trainComponents | async" />
+<shared-table [data]="trainComponents()" />
 
 <management-view-dialog [visibility]="showModal" (visibilityChange)="showModal = $event" (compDataChange)="saveComponent($event)" />
 

@@ -1,6 +1,5 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, signal} from '@angular/core';
 import {TrainComponentsService} from './services/train-components.service';
-import {AsyncPipe} from '@angular/common';
 import {Button} from 'primeng/button';
 import {ManagementViewDialog} from './features/management-view-dialog/management-view-dialog';
 import {
@@ -8,14 +7,13 @@ import {
   TrainDataPaginationModel
 } from './features/management-view-dialog/models/train-component.model';
 import {TableComponent} from './features/table/table';
-import {Observable} from 'rxjs';
+import {MessageService} from 'primeng/api';
 
 @Component({
   templateUrl: './management-view.html',
   styleUrls: ['./management-view.scss'],
   imports: [
     TableComponent,
-    AsyncPipe,
     Button,
     ManagementViewDialog
   ],
@@ -26,12 +24,15 @@ import {Observable} from 'rxjs';
 export class ManagementViewComponent implements OnInit {
 
   // data
-  trainComponents!: Observable<TrainDataPaginationModel>;
+  trainComponents = signal<TrainDataPaginationModel | null>(null);
 
   // config
   showModal = false;
 
-  constructor(private trainComponentsService: TrainComponentsService) {
+  constructor(
+    private trainComponentsService: TrainComponentsService,
+    private messageService: MessageService
+  ) {
   }
 
   ngOnInit(): void {
@@ -39,13 +40,21 @@ export class ManagementViewComponent implements OnInit {
   }
 
   getTrainComponents(): void {
-    this.trainComponents = this.trainComponentsService.getComponents();
+    this.trainComponentsService.getComponents().subscribe({
+      next: (data) => this.trainComponents.set(data)
+    });
   }
 
   saveComponent(component: TrainComponentCreateModel | null): void {
     if (component) {
       this.trainComponentsService.createComponent(component).subscribe({
         next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Train component created successfully',
+            life: 3000
+          });
           this.getTrainComponents();
         }
       })
